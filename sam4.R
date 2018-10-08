@@ -15,9 +15,27 @@ model
 model2 <- randomForest(Species ~ ., data=train, ntree=200, mtry=3, na.action=na.omit)
 model2
 
-pred <- predict(model, newdata=test)
+model3 <- randomForest(Species ~ ., data=train, importance = T)
+
+importance(model3) # 높으면 중요한 변수 
+
+pred <- predict(model2, newdata=test)
 
 pred
-table(pred, test$Species)
+table(obs = test$Species, predict= pred)
 
 confusionMatrix(pred, test$Species) 
+
+# 최적의 모델을 위한 파라미터값 얻기
+ntree <- c(400, 500, 600)
+mtry <- c(2:4)
+param <- data.frame(n=ntree, m=mtry)
+param
+for(i in param$n){
+  cat('ntree= ',i,'\n')
+  for(j in param$m){
+    cat('mtry=' ,j, '\n')
+    model_test <- randomForest(Species ~ ., data=train, ntree=i, mtry=j, na.action=na.omit)
+    print(model_test)
+    }
+}
